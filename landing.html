@@ -1,0 +1,1184 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TabNote - Free forever notes for your browser</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <meta
+      name="description"
+      content="TabNote turns every new tab into a calm writing space. Free forever, community-first, private by default, and easy to use."
+    />
+    <style>
+      :root {
+        --bg: #f9f8f6;
+        --bg-soft: #efe9e3;
+        --surface: rgba(249, 248, 246, 0.82);
+        --surface-strong: rgba(239, 233, 227, 0.94);
+        --line: rgba(201, 181, 156, 0.42);
+        --text: #2f2924;
+        --muted: #75695f;
+        --accent: #c9b59c;
+        --accent-2: #d9cfc7;
+        --accent-3: #efe9e3;
+        --shadow: 0 24px 70px rgba(79, 63, 48, 0.14);
+        --radius-xl: 32px;
+        --radius-lg: 24px;
+        --radius-md: 18px;
+        --content: 1180px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-width: 320px;
+        color: var(--text);
+        font-family: "Aptos", "Segoe UI", sans-serif;
+        background:
+          radial-gradient(
+            circle at 12% 20%,
+            rgba(201, 181, 156, 0.32),
+            transparent 30%
+          ),
+          radial-gradient(
+            circle at 85% 15%,
+            rgba(217, 207, 199, 0.36),
+            transparent 24%
+          ),
+          radial-gradient(
+            circle at 50% 75%,
+            rgba(239, 233, 227, 0.68),
+            transparent 28%
+          ),
+          linear-gradient(180deg, #f9f8f6 0%, #efe9e3 52%, #f9f8f6 100%);
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.35;
+        background-image:
+          linear-gradient(rgba(201, 181, 156, 0.14) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(201, 181, 156, 0.14) 1px,
+            transparent 1px
+          );
+        background-size: 32px 32px;
+        mask-image: radial-gradient(
+          circle at center,
+          black 30%,
+          transparent 90%
+        );
+      }
+
+      img {
+        max-width: 100%;
+        display: block;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .page-shell {
+        position: relative;
+        isolation: isolate;
+      }
+
+      .container {
+        width: min(var(--content), calc(100% - 40px));
+        margin: 0 auto;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      .topbar-inner {
+        display: flex;
+        justify-content: center;
+        padding: 18px 0;
+      }
+
+      .nav-shell {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 28px;
+        padding: 10px 14px 10px 16px;
+        border-radius: 999px;
+        background: rgba(249, 248, 246, 0.74);
+        border: 1px solid rgba(201, 181, 156, 0.38);
+        box-shadow: 0 18px 48px rgba(79, 63, 48, 0.1);
+        backdrop-filter: blur(18px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 16px 40px rgba(79, 63, 48, 0.18);
+        flex-shrink: 0;
+      }
+
+      .brand-copy strong,
+      .nav-links a,
+      h1,
+      h2,
+      h3,
+      .button,
+      .stat strong {
+        font-family: "Bahnschrift", "Aptos", sans-serif;
+      }
+
+      .brand-copy strong {
+        display: block;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: #1f2c21;
+      }
+
+      .brand-copy span {
+        display: block;
+        margin-top: 2px;
+        color: rgba(31, 44, 33, 0.64);
+        font-size: 0.88rem;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        color: rgba(31, 44, 33, 0.66);
+        font-size: 0.96rem;
+      }
+
+      .nav-links a {
+        transition: color 180ms ease;
+      }
+
+      .nav-links a:hover {
+        color: #102419;
+      }
+
+      .button-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        align-items: center;
+      }
+      .button-row.heroButtons {
+        justify-content: center;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        min-height: 50px;
+        padding: 0 20px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        transition:
+          transform 180ms ease,
+          box-shadow 180ms ease,
+          border-color 180ms ease,
+          background 180ms ease;
+      }
+
+      .button:hover {
+        transform: translateY(-1px);
+      }
+
+      .button.primary {
+        color: #2f2924;
+        background: linear-gradient(135deg, #d9cfc7, #c9b59c);
+        box-shadow: 0 18px 45px rgba(201, 181, 156, 0.24);
+      }
+
+      .button.secondary {
+        border-color: rgba(201, 181, 156, 0.46);
+        background: rgba(249, 248, 246, 0.62);
+        color: var(--text);
+      }
+
+      .button.secondary:hover {
+        border-color: rgba(201, 181, 156, 0.72);
+        background: rgba(239, 233, 227, 0.82);
+      }
+
+      .nav-download {
+        min-height: 46px;
+        padding: 0 18px;
+        color: #2f2924;
+        background: linear-gradient(135deg, #d9cfc7, #c9b59c);
+        box-shadow: inset 0 0 0 1px rgba(249, 248, 246, 0.36);
+      }
+
+      .hero {
+        padding: 48px 0 48px;
+      }
+
+      .hero-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 34px;
+        align-items: center;
+        text-align: center;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(239, 233, 227, 0.64);
+        border: 1px solid rgba(201, 181, 156, 0.34);
+        color: #5f5146;
+        font-size: 0.9rem;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent-2);
+        box-shadow: 0 0 16px rgba(201, 181, 156, 0.48);
+      }
+
+      h1 {
+        margin: 22px auto 18px;
+        font-size: clamp(3rem, 7vw, 6.25rem);
+        line-height: 0.96;
+      }
+
+      .headline-accent {
+        font-family: "Bricolage Grotesque", "Bahnschrift", sans-serif;
+        font-weight: 700;
+      }
+
+      .hero-copy p {
+        max-width: 62ch;
+        margin: 0 auto 28px;
+        color: var(--muted);
+        font-size: 1.14rem;
+        line-height: 1.75;
+      }
+
+      .micro-proof {
+        margin-top: 26px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+      }
+
+      .micro-proof span {
+        padding: 10px 12px;
+        border-radius: 999px;
+        background: rgba(239, 233, 227, 0.58);
+        border: 1px solid rgba(201, 181, 156, 0.32);
+        color: #75695f;
+        font-size: 0.92rem;
+      }
+
+      .hero-visual {
+        position: relative;
+        width: 100%;
+        min-height: 580px;
+        display: grid;
+        place-items: center;
+      }
+
+      .hero-glow {
+        position: absolute;
+        width: 78%;
+        aspect-ratio: 1 / 1;
+        border-radius: 50%;
+        background:
+          radial-gradient(
+            circle at 40% 35%,
+            rgba(201, 181, 156, 0.5),
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 60% 60%,
+            rgba(217, 207, 199, 0.48),
+            transparent 42%
+          );
+        filter: blur(36px);
+        animation: floatGlow 10s ease-in-out infinite;
+      }
+
+      .visual-card {
+        position: relative;
+        width: min(100%, 540px);
+        padding: 18px;
+        border-radius: var(--radius-xl);
+        background: linear-gradient(
+          180deg,
+          rgba(249, 248, 246, 0.84),
+          rgba(239, 233, 227, 0.58)
+        );
+        border: 1px solid rgba(201, 181, 156, 0.38);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px);
+        overflow: hidden;
+        transform: rotate(-3deg);
+        animation: driftCard 8s ease-in-out infinite;
+      }
+
+      .visual-card img {
+        width: 100%;
+        border-radius: 22px;
+        border: 1px solid rgba(201, 181, 156, 0.34);
+      }
+
+      .floating-note {
+        position: absolute;
+        max-width: 220px;
+        padding: 18px 18px 16px;
+        border-radius: 22px;
+        background: var(--surface-strong);
+        border: 1px solid rgba(201, 181, 156, 0.38);
+        box-shadow: 0 24px 60px rgba(79, 63, 48, 0.14);
+        backdrop-filter: blur(18px);
+      }
+
+      .floating-note strong {
+        display: block;
+        font-family: "Bahnschrift", "Aptos", sans-serif;
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+      }
+
+      .floating-note p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.55;
+        font-size: 0.92rem;
+      }
+
+      .floating-note.left {
+        left: -12px;
+        bottom: 44px;
+        animation: driftTag 7s ease-in-out infinite;
+      }
+
+      .floating-note.right {
+        top: 48px;
+        right: -12px;
+        animation: driftTag 9s ease-in-out infinite reverse;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 28px;
+      }
+
+      .stat {
+        padding: 18px 20px;
+        border-radius: var(--radius-md);
+        background: rgba(239, 233, 227, 0.58);
+        border: 1px solid rgba(201, 181, 156, 0.32);
+      }
+
+      .stat strong {
+        display: block;
+        font-size: 1.55rem;
+        margin-bottom: 6px;
+      }
+
+      .stat span {
+        display: block;
+        color: var(--muted);
+        font-size: 0.93rem;
+        line-height: 1.55;
+      }
+
+      .section {
+        padding: 44px 0;
+      }
+
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        align-items: end;
+        margin-bottom: 28px;
+      }
+
+      .section-head h2 {
+        margin: 0 0 10px;
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        line-height: 1;
+        max-width: 12ch;
+        font-family: "Bricolage Grotesque", "Bahnschrift", sans-serif;
+      }
+
+      .section-head p {
+        margin: 0;
+        color: var(--muted);
+        max-width: 56ch;
+        line-height: 1.75;
+        font-size: 1.02rem;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .feature-card,
+      .story-card,
+      .community-card,
+      .faq-card,
+      .cta-panel {
+        background: var(--surface);
+        border: 1px solid rgba(201, 181, 156, 0.34);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px);
+      }
+
+      .feature-card {
+        padding: 26px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .feature-card::after {
+        content: "";
+        position: absolute;
+        inset: auto -10% -40% auto;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(201, 181, 156, 0.22),
+          transparent 70%
+        );
+      }
+
+      .feature-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 15px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 18px;
+        font-weight: 700;
+        color: #2f2924;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        box-shadow: 0 12px 30px rgba(201, 181, 156, 0.22);
+      }
+
+      .feature-card h3 {
+        margin: 0 0 10px;
+        font-size: 1.2rem;
+      }
+
+      .feature-card p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.7;
+        font-size: 0.98rem;
+      }
+
+      .story-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+        gap: 18px;
+        align-items: stretch;
+      }
+
+      .story-card {
+        padding: 28px;
+      }
+
+      .story-card h3 {
+        margin: 0 0 14px;
+        font-size: 1.6rem;
+      }
+
+      .story-card p {
+        margin: 0 0 16px;
+        color: var(--muted);
+        line-height: 1.8;
+        font-size: 1rem;
+      }
+
+      .quote {
+        padding: 22px;
+        border-radius: 20px;
+        background: rgba(239, 233, 227, 0.58);
+        border: 1px solid rgba(201, 181, 156, 0.3);
+        color: #4c423a;
+        line-height: 1.75;
+        font-size: 1.02rem;
+      }
+
+      .shot-card {
+        position: relative;
+        overflow: hidden;
+        min-height: 100%;
+        padding: 16px;
+      }
+
+      .shot-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 20px;
+        border: 1px solid rgba(201, 181, 156, 0.34);
+      }
+
+      .community-card {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+        padding: 28px;
+      }
+
+      .community-block strong {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 1.05rem;
+      }
+
+      .community-block p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.72;
+        font-size: 0.97rem;
+      }
+
+      .faq-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .faq-card {
+        padding: 24px;
+      }
+
+      .faq-card h3 {
+        margin: 0 0 10px;
+        font-size: 20px;
+      }
+
+      .faq-card p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.7;
+        font-size: 16px;
+      }
+
+      .cta {
+        padding: 30px 0 84px;
+      }
+
+      .cta-panel {
+        position: relative;
+        overflow: hidden;
+        padding: 36px;
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        align-items: center;
+        background:
+          radial-gradient(
+            circle at 15% 20%,
+            rgba(201, 181, 156, 0.28),
+            transparent 28%
+          ),
+          radial-gradient(
+            circle at 85% 30%,
+            rgba(217, 207, 199, 0.36),
+            transparent 30%
+          ),
+          rgba(249, 248, 246, 0.88);
+      }
+
+      .cta-panel h2 {
+        margin: 0 0 10px;
+        font-size: clamp(2rem, 4vw, 3rem);
+        max-width: 12ch;
+        line-height: 1;
+        font-family: "Bricolage Grotesque", "Bahnschrift", sans-serif;
+      }
+
+      .cta-panel p {
+        margin: 0;
+        max-width: 58ch;
+        color: var(--muted);
+        line-height: 1.8;
+        font-size: 1rem;
+      }
+
+      .footer {
+        padding: 0 0 34px;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(28px);
+        transition:
+          opacity 700ms ease,
+          transform 700ms ease;
+      }
+
+      .reveal.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .delay-1 {
+        transition-delay: 90ms;
+      }
+      .delay-2 {
+        transition-delay: 180ms;
+      }
+      .delay-3 {
+        transition-delay: 270ms;
+      }
+
+      @keyframes driftCard {
+        0%,
+        100% {
+          transform: rotate(-3deg) translateY(0);
+        }
+        50% {
+          transform: rotate(-1.5deg) translateY(-10px);
+        }
+      }
+
+      @keyframes driftTag {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      @keyframes floatGlow {
+        0%,
+        100% {
+          transform: scale(1) translateY(0);
+        }
+        50% {
+          transform: scale(1.04) translateY(-10px);
+        }
+      }
+
+      @media (max-width: 1100px) {
+        .story-grid,
+        .cta-panel {
+          grid-template-columns: 1fr;
+        }
+
+        .feature-grid,
+        .community-card,
+        .faq-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .hero-visual {
+          min-height: auto;
+          padding-top: 12px;
+        }
+
+        .floating-note.left {
+          left: 8px;
+          bottom: 18px;
+        }
+
+        .floating-note.right {
+          right: 8px;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .container {
+          width: min(var(--content), calc(100% - 24px));
+        }
+
+        .section-head,
+        .footer-inner {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .topbar-inner {
+          justify-content: center;
+        }
+
+        .nav-shell {
+          width: 100%;
+          flex-wrap: wrap;
+          gap: 14px;
+          border-radius: 28px;
+        }
+
+        .nav-links {
+          flex-wrap: wrap;
+          gap: 14px;
+          justify-content: center;
+        }
+
+        .hero {
+          padding-top: 38px;
+        }
+
+        h1 {
+          max-width: none;
+          font-size: clamp(2.7rem, 12vw, 4.5rem);
+        }
+
+        .stats,
+        .feature-grid,
+        .community-card,
+        .faq-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .visual-card {
+          transform: none;
+        }
+
+        .floating-note {
+          position: static;
+          max-width: none;
+          margin-top: 14px;
+        }
+
+        .button-row {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .button {
+          width: 100%;
+        }
+
+        .cta-panel {
+          padding: 28px;
+        }
+
+        .section-head,
+        .footer-inner {
+          text-align: left;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="container topbar-inner">
+          <div class="nav-shell">
+            <a class="brand" href="#top">
+              <span class="brand-mark">
+                <img
+                  src="Gemini_Generated_Image_nienczniencznien (2).png"
+                  alt="TabNote logo"
+                />
+              </span>
+              <span class="brand-copy">
+                <strong>TabNote</strong>
+              </span>
+            </a>
+
+            <nav class="nav-links">
+              <a href="#features">Features</a>
+              <a href="#why">Why it helps</a>
+              <a href="#community">Free forever</a>
+              <a href="#faq">FAQ</a>
+              <a href="#download">Get TabNote</a>
+            </nav>
+            <a class="button nav-download" href="#download">Download</a>
+          </div>
+        </div>
+      </header>
+
+      <main id="top">
+        <section class="hero">
+          <div class="container hero-grid">
+            <div class="hero-copy reveal is-visible">
+              <div class="eyebrow">
+                Completely free. Built for the community. Yours forever.
+              </div>
+              <h1>
+                Every new tab becomes your
+                <span class="headline-accent">calmest place to think.</span>
+              </h1>
+              <p>
+                TabNote turns the blank moment between tabs into something
+                useful. Open your browser, write instantly, keep notes
+                organized, and stay in flow without accounts, setup,
+                subscriptions, or clutter.
+              </p>
+
+              <div class="button-row heroButtons">
+                <a class="button primary" href="#download"
+                  >Start using TabNote</a
+                >
+                <a class="button secondary" href="#features"
+                  >See what it does</a
+                >
+              </div>
+
+              <div class="micro-proof">
+                <span>Free forever</span>
+                <span>No account needed</span>
+                <span>Local-first and private</span>
+                <span>Ready in seconds</span>
+              </div>
+
+              <div class="stats">
+                <div class="stat reveal delay-1">
+                  <strong>Instant</strong>
+                  <span
+                    >Your notes open the moment a new tab does, so capture
+                    happens before the thought slips.</span
+                  >
+                </div>
+                <div class="stat reveal delay-2">
+                  <strong>Simple</strong>
+                  <span
+                    >No folders to wrestle with, no heavy dashboard, just the
+                    tools that keep you moving.</span
+                  >
+                </div>
+                <div class="stat reveal delay-3">
+                  <strong>Yours</strong>
+                  <span
+                    >Built to feel like a helpful everyday tool, not a product
+                    trying to lock you in.</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="hero-visual reveal delay-1">
+              <div class="hero-glow"></div>
+              <div class="visual-card">
+                <img
+                  src="unnamed (1).png"
+                  alt="TabNote screenshots showing note lists, editor, popup, and stats"
+                />
+              </div>
+              <div class="floating-note left">
+                <strong>Zero friction</strong>
+                <p>
+                  Open a tab. Start typing. That small difference is why people
+                  actually keep using it.
+                </p>
+              </div>
+              <div class="floating-note right">
+                <strong>Focus stays intact</strong>
+                <p>
+                  Pin important notes, track your counts, and keep small tasks
+                  from getting lost.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="features">
+          <div class="container">
+            <div class="section-head reveal">
+              <div>
+                <h2>Core features that stay out of your way.</h2>
+              </div>
+              <p>
+                TabNote is intentionally lightweight. The goal is not to replace
+                every writing app. The goal is to make quick capture,
+                lightweight planning, and everyday notes feel natural.
+              </p>
+            </div>
+
+            <div class="feature-grid">
+              <article class="feature-card reveal">
+                <div class="feature-icon">01</div>
+                <h3>New tab note-taking</h3>
+                <p>
+                  Every fresh tab gives you a writing space instantly, so ideas,
+                  tasks, links, and rough drafts land somewhere useful.
+                </p>
+              </article>
+
+              <article class="feature-card reveal delay-1">
+                <div class="feature-icon">02</div>
+                <h3>Multiple notes, easy switching</h3>
+                <p>
+                  Keep one note for today, one for work, one for personal
+                  reminders, and jump between them without a heavy workflow.
+                </p>
+              </article>
+
+              <article class="feature-card reveal delay-2">
+                <div class="feature-icon">03</div>
+                <h3>Pins, counts, and quick actions</h3>
+                <p>
+                  Pin important notes to the top, copy what you wrote, download
+                  it when you need it, and track words, characters, and lines.
+                </p>
+              </article>
+
+              <article class="feature-card reveal">
+                <div class="feature-icon">04</div>
+                <h3>Popup access anywhere</h3>
+                <p>
+                  The popup makes it easy to open TabNote and jump back into
+                  recent notes from anywhere in your browser session.
+                </p>
+              </article>
+
+              <article class="feature-card reveal delay-1">
+                <div class="feature-icon">05</div>
+                <h3>Private by default</h3>
+                <p>
+                  No account wall, no forced sync, no unnecessary complexity. It
+                  stays simple, fast, and personal.
+                </p>
+              </article>
+
+              <article class="feature-card reveal delay-2">
+                <div class="feature-icon">06</div>
+                <h3>Free forever, community-first</h3>
+                <p>
+                  This is meant to be useful to people, full stop. No paywall
+                  roadmap, no bait-and-switch, just a tool you can keep.
+                </p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="why">
+          <div class="container story-grid">
+            <div class="story-card reveal">
+              <h3>Why TabNote helps</h3>
+              <p>
+                Most ideas are small when they arrive. A task. A line. A
+                reminder. A rough sentence. The usual problem is not writing
+                them down. It is the tiny wall before writing them down.
+              </p>
+              <p>
+                TabNote removes that wall. Instead of opening a separate app,
+                waiting for it to load, and breaking your flow, the note space
+                is already there in the place you visit all day.
+              </p>
+              <div class="quote">
+                Useful tools earn their place by being easy at the exact moment
+                you need them. TabNote is built around that moment.
+              </div>
+            </div>
+
+            <div class="story-card shot-card reveal delay-1">
+              <img
+                src="Gemini_Generated_Image_nienczniencznien (2).png"
+                alt="TabNote brand art"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="community">
+          <div class="container">
+            <div class="section-head reveal">
+              <div>
+                <h2>Made to feel generous.</h2>
+              </div>
+              <p>
+                The message matters here. TabNote is not asking people to rent
+                their own notes back from a subscription. It is a simple browser
+                tool offered freely, for the community, and built to stay
+                approachable.
+              </p>
+            </div>
+
+            <div class="community-card">
+              <div class="community-block reveal">
+                <strong>Completely free</strong>
+                <p>
+                  No pricing maze, no gated basics, no forced upgrade path just
+                  to keep using the core experience.
+                </p>
+              </div>
+              <div class="community-block reveal delay-1">
+                <strong>For the community</strong>
+                <p>
+                  It is shaped around everyday usefulness, not around squeezing
+                  more steps between you and your own workflow.
+                </p>
+              </div>
+              <div class="community-block reveal delay-2">
+                <strong>Yours forever</strong>
+                <p>
+                  The value proposition is trust: a tool that stays small,
+                  direct, and dependable long after the first install.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="faq">
+          <div class="container">
+            <div class="section-head reveal">
+              <div>
+                <h2>Quick answers before you install.</h2>
+              </div>
+              <p>
+                A few practical details about how TabNote fits into your browser
+                and what to expect from the everyday writing experience.
+              </p>
+            </div>
+
+            <div class="faq-grid">
+              <article class="faq-card reveal">
+                <h3>Is TabNote really free forever?</h3>
+                <p>
+                  Yes. The core promise is simple: no account wall, no paywall
+                  for basic note-taking, and no forced upgrade path.
+                </p>
+              </article>
+
+              <article class="faq-card reveal delay-1">
+                <h3>Do I need to create an account?</h3>
+                <p>
+                  No. TabNote is built for fast, low-friction capture, so you
+                  can open a new tab and start writing without setup.
+                </p>
+              </article>
+
+              <article class="faq-card reveal delay-2">
+                <h3>What can I use it for?</h3>
+                <p>
+                  It works well for quick tasks, links, rough drafts, daily
+                  notes, meeting thoughts, and anything you want to catch fast.
+                </p>
+              </article>
+
+              <article class="faq-card reveal delay-3">
+                <h3>Does it replace a full notes app?</h3>
+                <p>
+                  Not quite. It is designed to stay light and immediate: a calm
+                  browser notepad for quick capture and everyday thinking.
+                </p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="cta" id="download">
+          <div class="container">
+            <div class="cta-panel reveal">
+              <div>
+                <h2>Write faster. Think clearer. Keep the tab.</h2>
+                <p>
+                  TabNote gives your browser a better default: one lightweight
+                  space for ideas, tasks, drafts, and daily notes. Free forever,
+                  easy to use, and ready whenever you are.
+                </p>
+              </div>
+
+              <div class="button-row">
+                <a class="button primary" href="newtab.html">Preview the app</a>
+                <a class="button secondary" href="popup.html">See the popup</a>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <div class="container footer-inner">
+          <span
+            >TabNote is a lightweight browser notepad built to help ideas land
+            before they disappear.</span
+          >
+          <span>Free forever. Community-first. Simple on purpose.</span>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      const reveals = document.querySelectorAll(".reveal");
+
+      if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("is-visible");
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.18 },
+        );
+
+        reveals.forEach((item) => {
+          if (!item.classList.contains("is-visible")) {
+            observer.observe(item);
+          }
+        });
+      } else {
+        reveals.forEach((item) => item.classList.add("is-visible"));
+      }
+    </script>
+  </body>
+</html>
